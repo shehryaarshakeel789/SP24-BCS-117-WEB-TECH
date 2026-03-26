@@ -55,6 +55,7 @@ button > a{
     display: flex;
     list-style: none;
     margin-bottom: 1em;
+    padding-left: 0;
 }
 .nav-bar-ul > li{
     background-color: white;
@@ -66,14 +67,18 @@ button > a{
     display: flex;
     width: 100%;
     justify-content: center;
+    margin-left: 12%;
 }
 .main-body{
     width: 100%;
+    position: relative;
 }
 .main-body-images{
     width: inherit;
 }
 .main-nav-bar-container{
+    position: sticky;
+    top: 0;
     display: flex;
     padding-top: 0.5em;
     padding-bottom: 0.5em;
@@ -147,4 +152,54 @@ button > a{
 .row-image{
     width: 50%;
     position: relative;
+}
+.main-body-text{
+    position: absolute;
+    bottom: 18%;
+    left: 30%;
+    color: #f6f6f6;
+    width: 40%;     
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.main-body-text h1{
+    font-size: 450%;
+    font-weight: 800;
+    letter-spacing: -10%;
+    justify-self: center;
+    margin: 0;
+}
+.main-body-text p{
+    width: 80%;
+    text-align: center;
+}
+.main-body-text button{
+    width: 10%;
+    border-radius: 1em;
+    font-size: 1em;
+    padding: 0.4em;
+}
+.row-image-text {
+    position: absolute;
+    bottom: 10%;
+    left: 9%;
+    color: white;
+}
+.row-image-text button{
+    border: none;
+    border-radius: 1em;
+    width: 4em;
+    padding: 0.3em;
+    font-size: 110%;
+    font-weight: bold;
+}
+.row-image-text h1{
+    font-size: 1em;
+    margin-top: 0;
+}
+.row-image-text p{
+    font-size: 1.5em;
+    margin-top: 0;
 }
