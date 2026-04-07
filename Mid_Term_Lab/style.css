@@ -295,8 +295,8 @@ button > a{
     width: 80%;
     justify-content: center;
     gap: 0.5em;
-    margin-left: 15%;
-    margin-right: 15%;
+    margin-left: 10%;
+    margin-right: 10%;
 }
 .spotlight-row-container > div{
     display: flex;
@@ -405,7 +405,68 @@ hr{
 .menu-ul.show{
     display: block;
 }
+#product-container{
+    display: flex;
+    width: 100%;
+    gap: 1.5em; 
+    padding: 2em 3em;
+    justify-content: center;
+}
+.product-card { 
+    width: 12%;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #e5e5e5; 
+    border-radius: 8px; 
+    padding: 1em; 
+}
+.product-card img { 
+    width: 100%; 
+    max-height: 160px; 
+    object-fit: contain; 
+    margin-bottom: 0.5em; 
+}
+.product-title { 
+    font-size: 0.85em; 
+    font-weight: 600; 
+    text-align: center;    
+    overflow: hidden; 
+    padding-left: 0%;
+}
+.product-card button { 
+    border: none; 
+    border-radius: 20px; 
+    background: #111; 
+    color: #fff; 
+    padding: 0.4em 1em; 
+    cursor: pointer; 
+}
 
+#modal-overlay { 
+    display: none; 
+    position: fixed; 
+    inset: 0;
+    background: rgba(0,0,0,0.5); 
+    z-index: 9999; 
+    align-items: center; 
+    justify-content: center; 
+}
+.modal-box { 
+    background: #fff; 
+    border-radius: 12px; 
+    padding: 2em; 
+    max-width: 440px; 
+    width: 90%; 
+    margin-left: 35%;
+    margin-top: 20%;
+    text-align: center; 
+}
+#modal-img { 
+    max-height: 150px; 
+    object-fit: contain; 
+}
 @media screen and (max-width: 768px) {
     .first-bar {
         justify-content: flex-end;
@@ -517,5 +578,8 @@ hr{
         flex-direction: column;
         gap: 0.5em;
         padding: 0.5em 1em;
+    }
+     .product-card {
+         width: 100%; 
     }
 }
