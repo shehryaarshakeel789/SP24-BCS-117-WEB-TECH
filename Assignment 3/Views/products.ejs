@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <link rel="stylesheet" href="/CSS/style.css">
+    <link rel="stylesheet" href="/CSS/products.css">
+</head>
+<body>
+    <header>
+        <div class="main-nav-bar-container">
+            <div class="logo-container">
+                <a class="nike-text" href="/">
+                    <img class="nike-logo" src="/images/nike_logo.png">
+                </a>
+            </div>
+            <div class="middle-nav-bar-container">
+                <ul class="nav-bar-ul">
+                    <li>
+                        <a href="/">
+                            Home
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="right-nav-bar-container">
+                <div class="search-bar">
+                    <img class="search-icon" src="/images/search-icon.png">
+                    <input class="search-input" type="search" placeholder="Search">
+                </div>
+                <div class="fav-link">
+                    <a href="/">
+                        <img class="fav-icon" src="/images/favourites-icon.png">
+                    </a>
+                </div>
+                <div class="cart-link">
+                    <a href="/">
+                        <img class="cart-icon" src="/images/cart-icon.png">
+                    </a>
+                </div>
+                <div class="hamburger">
+                    <img class="cart-icon" src="/images/hamburger.png">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="products-container">
+        <div class="filters-sidebar">
+            <h2>Filters</h2>
+
+            <form method="GET" action="/products" id="filterForm">
+                <div class="filter-section">
+                    <h3>Search</h3>
+                    <input type="text" name="search" class="search-input" placeholder="Product name" value="<%= search %>">
+                </div>
+
+                <div class="filter-section">
+                    <h3>Category</h3>
+                    <select name="category">
+                        <option value="">All</option>
+                        <% categories.forEach(cat => { %>
+                            <option value="<%= cat %>" <% if(category === cat) { %>selected<% } %>>
+                                <%= cat %>
+                            </option>
+                        <% }); %>
+                    </select>
+                </div>
+
+                <div class="filter-section">
+                    <h3>Price</h3>
+                    <div class="price-inputs">
+                        <input type="number" name="minPrice" placeholder="Min" value="<%= minPrice %>" min="<%= filterMinPrice %>">
+                        <input type="number" name="maxPrice" placeholder="Max" value="<%= maxPrice %>" max="<%= filterMaxPrice %>">
+                    </div>
+                </div>
+
+                <button type="submit" class="apply-btn">Apply</button>
+                <a href="/products" class="reset-btn">Reset</a>
+            </form>
+        </div>
+
+        <div class="products-main">
+            <div class="products-header">
+                <h1>Products</h1>
+                <span class="results-count">
+                    <%= products.length %> of <%= totalProducts %>
+                </span>
+            </div>
+
+            <% if (products.length > 0) { %>
+                <div class="products-grid">
+                    <% products.forEach(product => { %>
+                        <div class="product-card">
+                            <div class="product-info">
+                                <p class="product-category"><%= product.category %></p>
+                                <h3 class="product-name"><%= product.name %></h3>
+                                <p class="product-price">$<%= product.price.toFixed(2) %></p>
+                                <p class="product-rating">
+                                    <% if (product.rating > 0) { %>
+                                        ★ <%= product.rating %>
+                                    <% } else { %>
+                                        No rating
+                                    <% } %>
+                                </p>
+                                <p class="product-stock">
+                                    <% if (product.stock > 0) { %>
+                                        <span class="stock-available">In Stock</span>
+                                    <% } else { %>
+                                        <span class="stock-unavailable">Out of Stock</span>
+                                    <% } %>
+                                </p>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+
+                <% if (totalPages > 1) { %>
+                    <div class="pagination">
+                        <% if (page > 1) { %>
+                            <a href="/products?page=<%= page - 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %><%= category ? '&category=' + encodeURIComponent(category) : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>">← Prev</a>
+                        <% } else { %>
+                            <span class="disabled">← Prev</span>
+                        <% } %>
+
+                        <% for (var i = 1; i <= totalPages; i++) { %>
+                            <% if (i === page) { %>
+                                <span class="active"><%= i %></span>
+                            <% } else { %>
+                                <a href="/products?page=<%= i %><%= search ? '&search=' + encodeURIComponent(search) : '' %><%= category ? '&category=' + encodeURIComponent(category) : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>"><%= i %></a>
+                            <% } %>
+                        <% } %>
+
+                        <% if (page < totalPages) { %>
+                            <a href="/products?page=<%= page + 1 %><%= search ? '&search=' + encodeURIComponent(search) : '' %><%= category ? '&category=' + encodeURIComponent(category) : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>">Next →</a>
+                        <% } else { %>
+                            <span class="disabled">Next →</span>
+                        <% } %>
+                    </div>
+                <% } %>
+            <% } else { %>
+                <div class="no-products">
+                    <h2>No products found</h2>
+                    <p>Try adjusting your filters</p>
+                    <a href="/products" class="reset-link">Clear filters</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script src="/JS/products.js"></script>
+</body>
+</html>
