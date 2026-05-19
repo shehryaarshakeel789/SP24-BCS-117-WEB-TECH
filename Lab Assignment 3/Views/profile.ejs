@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile | Lab Assignment 3</title>
+  <link rel="stylesheet" href="/CSS/auth.css" />
+</head>
+<body>
+  <main>
+    <h1>My Profile</h1>
+    <% if (currentUser) { %>
+      <div class="profile-card">
+        <p><strong>Name:</strong> <%= currentUser.name %></p>
+        <p><strong>Email:</strong> <%= currentUser.email %></p>
+        <p><strong>Role:</strong> <%= currentUser.role %></p>
+      </div>
+      <a class="button" href="/">Back to Home</a>
+    <% } %>
+  </main>
+</body>
+</html>
