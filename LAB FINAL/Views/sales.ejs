@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sales Dashboard</title>
+
+    <!-- Google Fonts: Syne (display) + DM Mono (data) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ── Design tokens ──────────────────────────────────── */
+        :root {
+            --bg:         #0d0f14;
+            --surface:    #161a22;
+            --border:     #252b38;
+            --accent:     #f0c040;
+            --accent2:    #3dd6f5;
+            --red:        #ff5f6d;
+            --green:      #43e97b;
+            --text:       #e8eaf0;
+            --muted:      #6b7589;
+            --radius:     12px;
+            --font-head:  'Syne', sans-serif;
+            --font-data:  'DM Mono', monospace;
+        }
+
+        /* ── Reset & Base ───────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-head);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        /* ── Header ─────────────────────────────────────────── */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.25rem;
+        }
+        header h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--accent);
+        }
+        header h1 span { color: var(--text); }
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-data);
+            font-size: 0.75rem;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            padding: 0.4rem 0.9rem;
+            border-radius: 999px;
+        }
+        .live-dot {
+            width: 8px; height: 8px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.4; transform: scale(0.75); }
+        }
+
+        /* ── Grid layout ─────────────────────────────────────── */
+        .dashboard {
+            display: grid;
+            gap: 1.25rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        /* ── Stat cards ──────────────────────────────────────── */
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem 1.75rem;
+            position: relative;
+            overflow: hidden;
+            animation: fadeUp 0.5s ease both;
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .stat-card:hover::after { opacity: 1; }
+        .stat-card.yellow::after { box-shadow: inset 0 0 0 1px var(--accent); }
+        .stat-card.blue::after   { box-shadow: inset 0 0 0 1px var(--accent2); }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            font-family: var(--font-data);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--muted);
+            margin-bottom: 0.6rem;
+        }
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1;
+        }
+        .stat-value.yellow { color: var(--accent); }
+        .stat-value.blue   { color: var(--accent2); }
+        .stat-value.green  { color: var(--green); }
+
+        /* ── Wide panels ─────────────────────────────────────── */
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem 1.75rem;
+            animation: fadeUp 0.55s ease both;
+        }
+        .panel-title {
+            font-size: 0.7rem;
+            font-family: var(--font-data);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--muted);
+            margin-bottom: 1.25rem;
+        }
+
+        /* Top Products list */
+        .product-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid var(--border);
+            gap: 1rem;
+        }
+        .product-row:last-child { border-bottom: none; }
+        .product-rank {
+            font-family: var(--font-data);
+            font-size: 0.7rem;
+            color: var(--muted);
+            width: 1.5rem;
+            flex-shrink: 0;
+        }
+        .product-name {
+            flex: 1;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .product-qty {
+            font-family: var(--font-data);
+            font-size: 0.78rem;
+            color: var(--accent);
+            background: rgba(240,192,64,0.1);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        /* Monthly trend bars */
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+            height: 120px;
+        }
+        .bar-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            height: 100%;
+            gap: 0.4rem;
+        }
+        .bar {
+            width: 100%;
+            background: var(--accent);
+            border-radius: 4px 4px 0 0;
+            transition: height 0.6s cubic-bezier(.22,1,.36,1);
+            min-height: 4px;
+        }
+        .bar-label {
+            font-family: var(--font-data);
+            font-size: 0.65rem;
+            color: var(--muted);
+        }
+
+        /* Status breakdown */
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+        .status-item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.9rem 1rem;
+        }
+        .status-name {
+            font-size: 0.7rem;
+            font-family: var(--font-data);
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 0.35rem;
+        }
+        .status-rev {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent2);
+        }
+        .status-count {
+            font-family: var(--font-data);
+            font-size: 0.7rem;
+            color: var(--muted);
+        }
+
+        /* Recent orders table */
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+        .orders-table th {
+            font-family: var(--font-data);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            padding: 0 0 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .orders-table td {
+            padding: 0.65rem 0;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        .orders-table tr:last-child td { border-bottom: none; }
+        .orders-table .mono {
+            font-family: var(--font-data);
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+        .status-pill {
+            font-family: var(--font-data);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            padding: 0.2rem 0.55rem;
+            border-radius: 4px;
+        }
+        .pill-pending   { background: rgba(240,192,64,0.15); color: var(--accent); }
+        .pill-confirmed { background: rgba(61,214,245,0.15); color: var(--accent2); }
+        .pill-shipped   { background: rgba(67,233,123,0.15); color: var(--green); }
+        .pill-delivered { background: rgba(67,233,123,0.25); color: var(--green); }
+
+        /* ── Responsive ──────────────────────────────────────── */
+        .wide { grid-column: 1 / -1; }
+        @media (min-width: 900px) {
+            .half { grid-column: span 2; }
+        }
+        @media (max-width: 600px) {
+            body { padding: 1rem; }
+            .bar-chart { height: 80px; }
+        }
+
+        /* ── Last-updated ticker ─────────────────────────────── */
+        #last-updated {
+            font-family: var(--font-data);
+            font-size: 0.7rem;
+            color: var(--muted);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><span>Sales</span> Dashboard</h1>
+        <div class="live-badge">
+            <span class="live-dot"></span>
+            <span>Live &bull; auto-refresh every 30 s</span>
+            <span id="last-updated"></span>
+        </div>
+    </header>
+
+    <div class="dashboard" id="dashboard">
+
+        <!-- ── KPI Cards ──────────────────────────────────────── -->
+        <div class="stat-card yellow">
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value yellow" id="totalRevenue">
+                $<%= stats.totalRevenue.toFixed(2) %>
+            </div>
+        </div>
+
+        <div class="stat-card blue">
+            <div class="stat-label">Total Orders</div>
+            <div class="stat-value blue" id="totalOrders">
+                <%= stats.totalOrders %>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Avg Order Value</div>
+            <div class="stat-value green" id="avgOrder">
+                $<%= stats.totalOrders > 0
+                    ? (stats.totalRevenue / stats.totalOrders).toFixed(2)
+                    : "0.00" %>
+            </div>
+        </div>
+
+        <!-- ── Monthly Trend ──────────────────────────────────── -->
+        <div class="panel half" id="trendPanel">
+            <div class="panel-title">Monthly Revenue Trend (last 6 months)</div>
+            <div class="bar-chart" id="barChart">
+                <%
+                    // Find the maximum revenue across months for scaling
+                    const maxRev = Math.max(...stats.monthlyTrend.map(m => m.revenue), 1);
+                    const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                %>
+                <% stats.monthlyTrend.forEach(m => { %>
+                    <%
+                        const pct  = Math.max(4, Math.round((m.revenue / maxRev) * 100));
+                        const name = MONTH_NAMES[m._id.month - 1];
+                    %>
+                    <div class="bar-wrap">
+                        <div class="bar" style="height: <%= pct %>%;"></div>
+                        <div class="bar-label"><%= name %></div>
+                    </div>
+                <% }) %>
+                <% if (stats.monthlyTrend.length === 0) { %>
+                    <div style="color: var(--muted); font-size: 0.85rem; align-self: center; width: 100%; text-align: center;">
+                        No order data yet
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- ── Top Products ───────────────────────────────────── -->
+        <div class="panel half" id="topProductsPanel">
+            <div class="panel-title">Top Selling Products</div>
+            <% stats.topProducts.forEach((p, i) => { %>
+                <div class="product-row">
+                    <span class="product-rank">#<%= i + 1 %></span>
+                    <span class="product-name"><%= p.name %></span>
+                    <span class="product-qty"><%= p.totalQuantity %> sold</span>
+                </div>
+            <% }) %>
+            <% if (stats.topProducts.length === 0) { %>
+                <p style="color: var(--muted); font-size: 0.85rem;">No data yet</p>
+            <% } %>
+        </div>
+
+        <!-- ── Status Breakdown ───────────────────────────────── -->
+        <div class="panel" id="statusPanel">
+            <div class="panel-title">Revenue by Status</div>
+            <div class="status-grid">
+                <% stats.revenueByStatus.forEach(s => { %>
+                    <div class="status-item">
+                        <div class="status-name"><%= s._id %></div>
+                        <div class="status-rev">$<%= s.revenue.toFixed(2) %></div>
+                        <div class="status-count"><%= s.count %> orders</div>
+                    </div>
+                <% }) %>
+                <% if (stats.revenueByStatus.length === 0) { %>
+                    <div style="color: var(--muted); font-size: 0.85rem; grid-column: 1/-1;">No data yet</div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- ── Recent Orders ─────────────────────────────────── -->
+        <div class="panel wide" id="recentPanel">
+            <div class="panel-title">Recent Transactions</div>
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% stats.recentOrders.forEach(o => { %>
+                        <tr>
+                            <td class="mono">#<%= o._id.toString().slice(-6).toUpperCase() %></td>
+                            <td><%= o.user?.name ?? "—" %></td>
+                            <td class="mono"><%= o.items.length %></td>
+                            <td><strong>$<%= o.totalPrice.toFixed(2) %></strong></td>
+                            <td>
+                                <span class="status-pill pill-<%= o.status %>">
+                                    <%= o.status %>
+                                </span>
+                            </td>
+                            <td class="mono">
+                                <%= new Date(o.createdAt).toLocaleDateString('en-US', {
+                                    month: 'short', day: 'numeric', year: 'numeric'
+                                }) %>
+                            </td>
+                        </tr>
+                    <% }) %>
+                    <% if (stats.recentOrders.length === 0) { %>
+                        <tr>
+                            <td colspan="6" style="text-align:center; color: var(--muted); padding: 2rem 0;">
+                                No orders yet
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+    </div><!-- /.dashboard -->
+
+    <script>
+        // ── Real-time polling ─────────────────────────────────
+        // Calls GET /api/v1/sales-data every 30 seconds and
+        // updates the KPI cards without a full page reload.
+        const POLL_INTERVAL = 30_000; // 30 seconds
+
+        function fmt(n)  { return "$" + Number(n).toFixed(2); }
+        function tick()  {
+            const now = new Date();
+            document.getElementById("last-updated").textContent =
+                " · " + now.toLocaleTimeString();
+        }
+
+        async function refreshStats() {
+            try {
+                const res  = await fetch("/api/v1/sales-data");
+                if (!res.ok) return;
+                const json = await res.json();
+                const d    = json.data;
+
+                // Update KPI cards
+                document.getElementById("totalRevenue").textContent =
+                    fmt(d.totalRevenue);
+                document.getElementById("totalOrders").textContent =
+                    d.totalOrders;
+                document.getElementById("avgOrder").textContent =
+                    d.totalOrders > 0
+                        ? fmt(d.totalRevenue / d.totalOrders)
+                        : "$0.00";
+
+                tick();
+            } catch (e) {
+                console.warn("Sales poll error:", e);
+            }
+        }
+
+        // Initial tick then start polling
+        tick();
+        setInterval(refreshStats, POLL_INTERVAL);
+    </script>
+
+</body>
+</html>
